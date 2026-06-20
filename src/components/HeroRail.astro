@@ -1,0 +1,106 @@
+---
+import { navItems, profile } from "../data/profile";
+import type { GitHubProfileSnapshot } from "../data/types";
+import AnchorNav from "./AnchorNav.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+
+interface Props {
+  githubProfile: GitHubProfileSnapshot | null;
+}
+
+const { githubProfile } = Astro.props;
+const avatar = githubProfile?.avatar_url ?? profile.avatar;
+---
+
+<aside class="hero-rail">
+  <div class="hero-rail__inner">
+    <div class="flex items-start justify-between gap-3">
+      <img
+        alt="GitHub avatar for colorlinketh"
+        class="h-22 w-22 rounded-[2rem] border border-white/80 object-cover shadow-lg shadow-[var(--shadow-soft)]"
+        height="88"
+        loading="eager"
+        src={avatar}
+        width="88"
+      />
+      <ThemeToggle />
+    </div>
+
+    <div class="space-y-4">
+      <div>
+        <p class="text-sm uppercase tracking-[0.26em] text-[var(--text-faint)]">colorlinketh</p>
+        <h1 class="mt-2 text-4xl font-semibold tracking-[-0.04em] text-[var(--text-main)]">
+          {profile.displayName}
+        </h1>
+      </div>
+      <div class="space-y-2">
+        <p class="text-lg font-semibold leading-snug text-[var(--text-main)]">{profile.headlineZh}</p>
+        <p class="text-sm leading-6 text-[var(--text-soft)]">{profile.headline}</p>
+      </div>
+      <p class="text-sm leading-7 text-[var(--text-soft)]">{profile.taglineZh}</p>
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+      <a
+        class="inline-flex max-w-full items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface-card)] px-4 py-2 text-sm font-medium text-[var(--text-main)] transition hover:border-[var(--line-strong)] hover:shadow-md hover:shadow-[var(--shadow-soft)]"
+        href={profile.github}
+        rel="noreferrer"
+        target="_blank"
+      >
+        <span>GitHub</span>
+        <span aria-hidden="true">↗</span>
+      </a>
+      {
+        githubProfile && (
+          <div class="flex max-w-full flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl border border-[var(--line)] bg-[var(--surface-card)] px-4 py-2 text-sm text-[var(--text-soft)] sm:rounded-full">
+            <span>{githubProfile.public_repos} repos</span>
+            <span>{githubProfile.followers} followers</span>
+          </div>
+        )
+      }
+    </div>
+
+    <div class="rounded-[2rem] border border-[var(--line)] bg-[var(--surface-card)] p-5 shadow-sm shadow-[var(--shadow-soft)]">
+      <p class="text-xs uppercase tracking-[0.22em] text-[var(--text-faint)]">About</p>
+      <p class="mt-3 text-sm leading-7 text-[var(--text-soft)]">{profile.heroParagraphZh}</p>
+      <p class="mt-3 text-xs leading-6 text-[var(--text-faint)]">{profile.heroParagraphEn}</p>
+    </div>
+
+    <AnchorNav items={navItems} />
+
+    <div class="space-y-4 rounded-[2rem] border border-[var(--line)] bg-[var(--surface-card)] p-5 shadow-sm shadow-[var(--shadow-soft)]">
+      <div class="flex items-center justify-between gap-3">
+        <p class="text-xs uppercase tracking-[0.22em] text-[var(--text-faint)]">Open To</p>
+        <span class="text-[11px] uppercase tracking-[0.18em] text-[var(--accent-lime)]">2026</span>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        {
+          profile.openTo.map((item) => (
+            <span class="chip text-xs">{item}</span>
+          ))
+        }
+      </div>
+      <div class="motif-panel">
+        <svg fill="none" viewBox="0 0 220 120" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 80 L70 30 L118 54 L168 18 L198 66" stroke="url(#rail-line)" stroke-width="1.4" />
+          <path d="M18 78 L56 100 L118 54 L152 92 L198 66" stroke="url(#rail-line)" stroke-opacity=".6" stroke-width="1.2" />
+          <circle cx="20" cy="80" fill="#46B9E8" r="6" />
+          <circle cx="70" cy="30" fill="#7A7BFF" r="6" />
+          <circle cx="118" cy="54" fill="#29C6A7" r="5" />
+          <circle cx="168" cy="18" fill="#FFB347" r="5" />
+          <circle cx="198" cy="66" fill="#A2DB5B" r="6" />
+          <circle cx="56" cy="100" fill="#FF7A59" r="4.5" />
+          <circle cx="152" cy="92" fill="#B173FF" r="4.5" />
+          <defs>
+            <linearGradient id="rail-line" x1="20" x2="198" y1="18" y2="100">
+              <stop stop-color="#46B9E8" />
+              <stop offset=".33" stop-color="#7A7BFF" />
+              <stop offset=".66" stop-color="#29C6A7" />
+              <stop offset="1" stop-color="#FFB347" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+    </div>
+  </div>
+</aside>

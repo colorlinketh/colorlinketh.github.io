@@ -1,0 +1,63 @@
+---
+import type { NavItem } from "../data/types";
+
+interface Props {
+  items: NavItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav aria-label="Section navigation">
+  <ul class="space-y-2">
+    {
+      items.map((item, index) => (
+        <li>
+          <a
+            class="group nav-link flex items-center justify-between gap-3 rounded-2xl px-3 py-2 text-sm text-[var(--text-soft)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--text-main)]"
+            data-nav-link
+            href={`#${item.id}`}
+          >
+            <span class="flex items-center gap-3">
+              <span class="text-xs font-semibold tracking-[0.22em] text-[var(--accent-cyan)]/80">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <span>{item.labelZh}</span>
+            </span>
+            <span class="text-xs uppercase tracking-[0.16em] text-[var(--text-faint)]">
+              {item.labelEn}
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<script is:inline>
+  const navLinks = Array.from(document.querySelectorAll("[data-nav-link]"));
+  const sections = Array.from(document.querySelectorAll("[data-section]"));
+
+  if (navLinks.length && sections.length) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+        if (!visible) return;
+
+        navLinks.forEach((link) => {
+          const isActive = link.getAttribute("href") === `#${visible.target.id}`;
+          link.classList.toggle("is-active", isActive);
+        });
+      },
+      {
+        rootMargin: "-28% 0px -56% 0px",
+        threshold: [0.2, 0.35, 0.5, 0.7],
+      },
+    );
+
+    sections.forEach((section) => observer.observe(section));
+  }
+</script>

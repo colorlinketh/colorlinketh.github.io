@@ -1,0 +1,53 @@
+---
+import { formatRepoDate } from "../data/github";
+import type { GitHubRepo } from "../data/types";
+
+interface Props {
+  repo: GitHubRepo;
+}
+
+const { repo } = Astro.props;
+---
+
+<article class="surface-card h-full">
+  <div class="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <div class="min-w-0">
+      <h3 class="text-lg font-semibold tracking-tight text-[var(--text-main)]">
+        <a class="break-words" href={repo.html_url} rel="noreferrer" target="_blank">{repo.name}</a>
+      </h3>
+      <p class="mt-3 text-sm leading-7 text-[var(--text-soft)]">
+        {repo.description ?? "No public description yet."}
+      </p>
+    </div>
+    <div class="flex flex-wrap gap-2 sm:shrink-0 sm:flex-col sm:items-end">
+      {repo.fork && <span class="fork-chip">Fork / Curation</span>}
+      {repo.archived && <span class="subtle-badge">Archived</span>}
+    </div>
+  </div>
+
+  <div class="mt-5 flex flex-wrap gap-2">
+    {repo.language && <span class="chip">{repo.language}</span>}
+    {(repo.topics ?? []).slice(0, 4).map((topic) => (
+      <span class="chip">{topic}</span>
+    ))}
+  </div>
+
+  <dl class="mt-6 grid grid-cols-2 gap-3 text-sm text-[var(--text-soft)] md:grid-cols-4">
+    <div>
+      <dt class="text-[11px] uppercase tracking-[0.18em] text-[var(--text-faint)]">Stars</dt>
+      <dd class="mt-1 font-medium text-[var(--text-main)]">{repo.stargazers_count}</dd>
+    </div>
+    <div>
+      <dt class="text-[11px] uppercase tracking-[0.18em] text-[var(--text-faint)]">Forks</dt>
+      <dd class="mt-1 font-medium text-[var(--text-main)]">{repo.forks_count}</dd>
+    </div>
+    <div>
+      <dt class="text-[11px] uppercase tracking-[0.18em] text-[var(--text-faint)]">Updated</dt>
+      <dd class="mt-1 font-medium text-[var(--text-main)]">{formatRepoDate(repo.updated_at)}</dd>
+    </div>
+    <div>
+      <dt class="text-[11px] uppercase tracking-[0.18em] text-[var(--text-faint)]">Role</dt>
+      <dd class="mt-1 font-medium text-[var(--text-main)]">{repo.fork ? "Curator" : "Builder"}</dd>
+    </div>
+  </dl>
+</article>

@@ -1,0 +1,45 @@
+<button
+  aria-label="Toggle color theme"
+  class="inline-flex items-center gap-3 rounded-full border border-[var(--line)] bg-[var(--surface-card)] px-3 py-2 text-sm text-[var(--text-main)] shadow-sm shadow-[var(--shadow-soft)] transition hover:border-[var(--line-strong)]"
+  id="theme-toggle"
+  type="button"
+>
+  <span class="text-xs uppercase tracking-[0.18em] text-[var(--text-faint)]">Theme</span>
+  <span
+    aria-hidden="true"
+    class="relative inline-flex h-6 w-11 items-center rounded-full bg-[var(--surface-muted)] transition"
+  >
+    <span
+      class="theme-toggle-thumb absolute left-1 h-4 w-4 rounded-full bg-[var(--text-main)] transition-transform"
+      id="theme-toggle-thumb"
+    />
+  </span>
+  <span class="text-xs font-medium" id="theme-toggle-label">Dark</span>
+</button>
+
+<script is:inline>
+  (() => {
+    const storageKey = "colorlinketh-theme-v2";
+    const root = document.documentElement;
+    const button = document.getElementById("theme-toggle");
+    const label = document.getElementById("theme-toggle-label");
+
+    const syncThemeUI = () => {
+      const theme = root.classList.contains("theme-dark") ? "dark" : "light";
+      if (label) {
+        label.textContent = theme === "dark" ? "Dark" : "Light";
+      }
+      button?.setAttribute("aria-pressed", String(theme === "dark"));
+    };
+
+    syncThemeUI();
+
+    button?.addEventListener("click", () => {
+      const nextTheme = root.classList.contains("theme-dark") ? "light" : "dark";
+      root.classList.toggle("theme-dark", nextTheme === "dark");
+      root.dataset.theme = nextTheme;
+      localStorage.setItem(storageKey, nextTheme);
+      syncThemeUI();
+    });
+  })();
+</script>

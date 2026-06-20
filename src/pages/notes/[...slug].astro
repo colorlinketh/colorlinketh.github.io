@@ -1,0 +1,42 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const notes = await getCollection("notes", ({ data }) => !data.draft);
+
+  return notes.map((note) => ({
+    params: { slug: note.id },
+    props: { note },
+  }));
+}
+
+const { note } = Astro.props;
+const { Content } = await render(note);
+---
+
+<BaseLayout description={note.data.summary} title={`${note.data.title} | colorlinketh notes`}>
+  <main class="mx-auto max-w-4xl px-4 py-10 md:px-6 lg:px-8">
+    <article class="surface-card note-shell">
+      <a class="inline-flex items-center gap-2 text-sm text-[var(--text-soft)] transition hover:text-[var(--text-main)]" href="/">
+        <span aria-hidden="true">←</span>
+        <span>Back to homepage</span>
+      </a>
+      <header class="mt-8 space-y-4 border-b border-[var(--line)] pb-6">
+        <p class="text-xs uppercase tracking-[0.18em] text-[var(--text-faint)]">
+          {new Intl.DateTimeFormat("en", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          }).format(note.data.pubDate)}
+        </p>
+        <h1 class="text-4xl font-semibold tracking-[-0.04em] text-[var(--text-main)]">{note.data.title}</h1>
+        <p class="max-w-3xl text-base leading-8 text-[var(--text-soft)]">{note.data.summary}</p>
+      </header>
+
+      <div class="note-prose mt-8">
+        <Content />
+      </div>
+    </article>
+  </main>
+</BaseLayout>

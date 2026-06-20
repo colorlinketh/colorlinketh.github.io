@@ -1,0 +1,327 @@
+---
+import { getCollection } from "astro:content";
+import HeroRail from "../components/HeroRail.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import RepoCard from "../components/RepoCard.astro";
+import Section from "../components/Section.astro";
+import Timeline from "../components/Timeline.astro";
+import { featuredProjects } from "../data/featuredProjects";
+import { focusAreas } from "../data/focusAreas";
+import { getFeaturedRepos, githubData } from "../data/github";
+import { profile } from "../data/profile";
+import { skillGroups } from "../data/skills";
+import { timeline } from "../data/timeline";
+import type { GitHubRepo } from "../data/types";
+import { updates } from "../data/updates";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const notes = await getCollection("notes", ({ data }) => !data.draft);
+const featuredRepos = getFeaturedRepos(8);
+
+const matchRepos = (hints: string[] = []): GitHubRepo[] => {
+  return githubData.repos.filter((repo) => {
+    const haystack = [repo.name, repo.description ?? "", ...(repo.topics ?? [])]
+      .join(" ")
+      .toLowerCase();
+    return hints.some((hint) => haystack.includes(hint.toLowerCase()));
+  });
+};
+---
+
+<BaseLayout>
+  <main class="mx-auto flex min-h-screen max-w-[1600px] flex-col gap-7 px-3 py-4 sm:gap-10 sm:px-4 sm:py-5 lg:grid lg:grid-cols-[320px_minmax(0,1fr)] lg:gap-8 lg:px-6 lg:py-6">
+    <HeroRail githubProfile={githubData.profile} />
+
+    <div class="min-w-0 space-y-8">
+      <div class="space-y-7 rounded-[1.5rem] border border-[var(--line)] bg-[var(--surface-panel)] p-4 shadow-xl shadow-[var(--shadow-soft)] backdrop-blur sm:space-y-8 sm:rounded-[2rem] sm:p-5 md:p-7 xl:p-8">
+        <Section id="vision" index="01" titleEn="Vision" titleZh="愿景">
+          <div class="grid gap-8 xl:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.95fr)] xl:items-center">
+            <div class="space-y-6">
+              <h2 class="max-w-4xl text-3xl font-semibold leading-tight text-[var(--text-main)] sm:text-4xl md:text-5xl md:tracking-[-0.04em]">
+                用 AI 代理与知识系统，放大创造力的边界。
+              </h2>
+              <p class="max-w-3xl text-base leading-8 text-[var(--text-soft)] md:text-lg">
+                {profile.visionZh}
+              </p>
+              <div class="flex flex-wrap gap-2.5">
+                {
+                  profile.visionChips.map((chip) => (
+                    <span class="chip chip--accent">{chip}</span>
+                  ))
+                }
+              </div>
+            </div>
+
+            <div class="vision-graph">
+              <div class="vision-graph__hub">AI
+                <br />
+                Agent
+              </div>
+              <div class="vision-graph__node vision-graph__node--left" style="--delay: 0s; --accent: var(--accent-cyan);">
+                知识 / Knowledge
+              </div>
+              <div class="vision-graph__node vision-graph__node--left" style="--delay: .12s; --accent: var(--accent-teal);">
+                工具 / Tools
+              </div>
+              <div class="vision-graph__node vision-graph__node--left" style="--delay: .24s; --accent: var(--accent-lime);">
+                数据 / Data
+              </div>
+              <div class="vision-graph__node vision-graph__node--left" style="--delay: .36s; --accent: var(--accent-violet);">
+                记忆 / Memory
+              </div>
+              <div class="vision-graph__node vision-graph__node--right" style="--delay: 0s; --accent: var(--accent-cyan);">
+                理解 / Understand
+              </div>
+              <div class="vision-graph__node vision-graph__node--right" style="--delay: .12s; --accent: var(--accent-teal);">
+                规划 / Plan
+              </div>
+              <div class="vision-graph__node vision-graph__node--right" style="--delay: .24s; --accent: var(--accent-orange);">
+                执行 / Execute
+              </div>
+              <div class="vision-graph__node vision-graph__node--right" style="--delay: .36s; --accent: var(--accent-amber);">
+                交付 / Deliver
+              </div>
+            </div>
+          </div>
+        </Section>
+
+        <div class="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+          <Section id="updates" index="02" titleEn="Updates" titleZh="近况">
+            <div class="surface-card">
+              <ul class="space-y-4">
+                {
+                  updates.map((item) => (
+                    <li class="flex gap-4">
+                      <span class="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--accent-cyan)] shadow-[0_0_0_5px_color-mix(in_oklab,var(--accent-cyan)_14%,transparent)]" />
+                      <div class="space-y-2">
+                        <div class="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-faint)]">
+                          <span>{item.date}</span>
+                          {item.label && <span class="subtle-badge">{item.label}</span>}
+                        </div>
+                        <p class="text-sm leading-7 text-[var(--text-main)]">{item.titleZh}</p>
+                        <div class="flex flex-wrap gap-2">
+                          {item.tags.map((tag) => (
+                            <span class="chip">{tag}</span>
+                          ))}
+                        </div>
+                      </div>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </Section>
+
+          <Section id="focus" index="03" titleEn="Focus Areas" titleZh="关注领域">
+            <div class="adaptive-card-grid">
+              {
+                focusAreas.map((area) => {
+                  const related = matchRepos(area.repoHints).slice(0, 2);
+                  return (
+                    <article class="surface-card">
+                      <div class="flex items-center gap-3">
+                        <span class="text-xs font-semibold tracking-[0.24em] text-[var(--accent-cyan)]">
+                          {area.index}
+                        </span>
+                        <h3 class="text-base font-semibold text-[var(--text-main)]">{area.titleZh}</h3>
+                      </div>
+                      <p class="mt-4 text-sm leading-7 text-[var(--text-soft)]">{area.descriptionZh}</p>
+                      <div class="mt-5 flex flex-wrap gap-2">
+                        {area.tags.map((tag) => (
+                          <span class="chip">{tag}</span>
+                        ))}
+                      </div>
+                      {
+                        related.length > 0 && (
+                          <div class="mt-5 flex flex-wrap gap-2">
+                            {related.map((repo) => (
+                              <a
+                                class="inline-flex items-center gap-2 rounded-full border border-[var(--line)] px-3 py-1.5 text-xs text-[var(--text-soft)] transition hover:border-[var(--line-strong)] hover:text-[var(--text-main)]"
+                                href={repo.html_url}
+                                rel="noreferrer"
+                                target="_blank"
+                              >
+                                <span>{repo.name}</span>
+                                {repo.fork && <span class="fork-chip">Fork / Curation</span>}
+                              </a>
+                            ))}
+                          </div>
+                        )
+                      }
+                    </article>
+                  );
+                })
+              }
+            </div>
+          </Section>
+        </div>
+
+        <Section id="projects" index="04" titleEn="Featured Projects" titleZh="精选项目">
+          <div class="grid gap-4 xl:grid-cols-2">
+            {
+              featuredProjects.map((project) => (
+                <ProjectCard project={project} relatedRepos={matchRepos(project.repoHints)} />
+              ))
+            }
+          </div>
+        </Section>
+
+        <div class="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+          <Section id="github-lab" index="05" titleEn="GitHub Lab" titleZh="GitHub Lab">
+            <div class="space-y-5">
+              <div class="surface-card">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <p class="text-sm uppercase tracking-[0.18em] text-[var(--text-faint)]">Public signal</p>
+                    <h3 class="mt-2 text-xl font-semibold text-[var(--text-main)]">
+                      用真实公开仓库展示 builder / curator 轨迹
+                    </h3>
+                  </div>
+                  <a
+                    class="inline-flex items-center gap-2 rounded-full border border-[var(--line)] px-4 py-2 text-sm font-medium text-[var(--text-main)] transition hover:border-[var(--line-strong)]"
+                    href={profile.github}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    <span>View GitHub</span>
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                </div>
+                <div class="mt-5 grid gap-3 sm:grid-cols-3">
+                  <div class="metric-card">
+                    <span class="metric-card__label">Repositories</span>
+                    <strong class="metric-card__value">{githubData.profile?.public_repos ?? "—"}</strong>
+                  </div>
+                  <div class="metric-card">
+                    <span class="metric-card__label">Followers</span>
+                    <strong class="metric-card__value">{githubData.profile?.followers ?? "—"}</strong>
+                  </div>
+                  <div class="metric-card">
+                    <span class="metric-card__label">Curated view</span>
+                    <strong class="metric-card__value">{featuredRepos.length}</strong>
+                  </div>
+                </div>
+                <p class="mt-5 text-sm leading-7 text-[var(--text-soft)]">
+                  这里优先展示近期活跃、与 Agent / Obsidian / Design / Video / MCP 相关的仓库。Fork 会明确标记为
+                  <span class="font-medium text-[var(--text-main)]"> Fork / Curation</span>，避免误导为原创项目。
+                </p>
+              </div>
+
+              {
+                featuredRepos.length > 0 ? (
+                  <div class="adaptive-repo-grid">
+                    {featuredRepos.map((repo) => <RepoCard repo={repo} />)}
+                  </div>
+                ) : (
+                  <div class="surface-card">
+                    <p class="text-sm leading-7 text-[var(--text-soft)]">
+                      GitHub data is temporarily unavailable. The site will still build, and the repo grid will return as soon as
+                      <code class="mx-1 rounded bg-[var(--surface-muted)] px-1.5 py-0.5 text-xs">pnpm fetch:github</code>
+                      succeeds.
+                    </p>
+                  </div>
+                )
+              }
+            </div>
+          </Section>
+
+          <Section id="skills" index="06" titleEn="Skills & Toolchain" titleZh="技能与工具">
+            <div class="space-y-4">
+              {
+                skillGroups.map((group) => (
+                  <article class="surface-card">
+                    <div class="flex flex-wrap items-center gap-3">
+                      <h3 class="text-base font-semibold text-[var(--text-main)]">{group.titleZh}</h3>
+                      <span class="text-xs uppercase tracking-[0.18em] text-[var(--text-faint)]">
+                        {group.titleEn}
+                      </span>
+                    </div>
+                    <p class="mt-3 text-sm leading-7 text-[var(--text-soft)]">{group.note}</p>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                      {group.items.map((item) => (
+                        <span class="chip">{item}</span>
+                      ))}
+                    </div>
+                  </article>
+                ))
+              }
+            </div>
+          </Section>
+        </div>
+
+        <div class="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+          <Section id="notes" index="07" titleEn="Notes / Writing" titleZh="笔记与写作">
+            <div class="surface-card">
+              {
+                notes.length > 0 ? (
+                  <ul class="space-y-4">
+                    {notes.slice(0, 5).map((note) => (
+                      <li class="flex flex-col gap-2 rounded-2xl border border-[var(--line)] px-4 py-4 md:flex-row md:items-center md:justify-between">
+                        <div>
+                          <p class="text-sm font-medium text-[var(--text-main)]">{note.data.title}</p>
+                          <p class="mt-1 text-sm leading-7 text-[var(--text-soft)]">{note.data.summary}</p>
+                        </div>
+                        <span class="text-xs uppercase tracking-[0.18em] text-[var(--text-faint)]">
+                          {new Intl.DateTimeFormat("en", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          }).format(note.data.pubDate)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div class="space-y-4">
+                    <p class="text-sm leading-7 text-[var(--text-soft)]">
+                      Notes will collect experiments, build logs, and workflow writeups.
+                    </p>
+                    <p class="text-xs leading-6 text-[var(--text-faint)]">
+                      目前保持极简占位，不生成任何虚构文章；等真实笔记进入
+                      <code class="mx-1 rounded bg-[var(--surface-muted)] px-1.5 py-0.5">src/content/notes</code>
+                      后会自动列出。
+                    </p>
+                  </div>
+                )
+              }
+            </div>
+          </Section>
+
+          <Section id="timeline" index="08" titleEn="Timeline" titleZh="项目演化">
+            <Timeline items={timeline} />
+          </Section>
+        </div>
+
+        <Section id="contact" index="09" titleEn="Contact" titleZh="联系">
+          <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+            <div class="surface-card">
+              <h3 class="text-lg font-semibold text-[var(--text-main)]">Open to thoughtful collaboration.</h3>
+              <p class="mt-4 text-sm leading-7 text-[var(--text-soft)]">
+                关注方向包括 AI 代理工作流、知识系统、创意自动化工具与产品原型。优先讨论可以被长期复用的小系统，而不是一次性噱头。
+              </p>
+              <div class="mt-5 flex flex-wrap gap-2">
+                {profile.openTo.map((item) => (
+                  <span class="chip chip--accent">{item}</span>
+                ))}
+              </div>
+            </div>
+            <div class="surface-card flex flex-col gap-4">
+              <a
+                class="inline-flex items-center gap-3 text-sm font-medium text-[var(--text-main)] transition hover:text-[var(--accent-cyan)]"
+                href={profile.github}
+                rel="noreferrer"
+                target="_blank"
+              >
+                <span class="contact-icon">↗</span>
+                <span>github.com/colorlinketh</span>
+              </a>
+              <p class="text-xs leading-6 text-[var(--text-faint)]">
+                Public identity stays as <span class="font-medium text-[var(--text-main)]">colorlinketh</span> until more profile details are intentionally added.
+              </p>
+            </div>
+          </div>
+        </Section>
+      </div>
+    </div>
+  </main>
+</BaseLayout>

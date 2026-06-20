@@ -1,0 +1,22 @@
+---
+interface Props {
+  id: string;
+  index: string;
+  titleZh: string;
+  titleEn: string;
+  className?: string;
+}
+
+const { id, index, titleZh, titleEn, className = "" } = Astro.props;
+---
+
+<section class:list={["scroll-mt-24 pt-1", className]} data-section id={id}>
+  <div class="mb-5 flex min-w-0 flex-wrap items-center gap-2 border-b border-[var(--line)] pb-4 sm:gap-3">
+    <span class="text-sm font-semibold tracking-[0.22em] text-[var(--accent-cyan)] sm:tracking-[0.26em]">{index}</span>
+    <h2 class="min-w-0 text-xl font-semibold tracking-tight text-[var(--text-main)] md:text-2xl">
+      {titleZh}
+    </h2>
+    <span class="max-w-full break-words text-xs uppercase tracking-[0.14em] text-[var(--text-faint)] sm:tracking-[0.2em]">{titleEn}</span>
+  </div>
+  <slot />
+</section>

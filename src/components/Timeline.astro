@@ -1,0 +1,27 @@
+---
+import type { TimelineItem } from "../data/types";
+
+interface Props {
+  items: TimelineItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<div class="timeline-list">
+  {
+    items.map((item, index) => (
+      <article class="timeline-card">
+        <div class="timeline-card__top">
+          <span class="timeline-card__dot" />
+          {index !== items.length - 1 && <span class="timeline-card__line" />}
+        </div>
+        <div class="space-y-3">
+          <p class="text-sm font-semibold tracking-[0.2em] text-[var(--accent-cyan)]">{item.date}</p>
+          <h3 class="text-lg font-semibold leading-tight text-[var(--text-main)]">{item.titleZh}</h3>
+          <p class="text-sm leading-7 text-[var(--text-soft)]">{item.summaryZh}</p>
+        </div>
+      </article>
+    ))
+  }
+</div>

@@ -1,0 +1,39 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "colorlinketh | AI Agent 与创意自动化构建者",
+  description = "colorlinketh 的个人主页：聚焦 AI Agent、知识系统、设计工具链与创意自动化。",
+} = Astro.props;
+---
+
+<!doctype html>
+<html class="theme-dark" data-theme="dark" lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta content={description} name="description" />
+    <meta content={title} property="og:title" />
+    <meta content={description} property="og:description" />
+    <meta content="website" property="og:type" />
+    <meta content="summary_large_image" name="twitter:card" />
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+    <title>{title}</title>
+    <script is:inline>
+      (() => {
+        const storageKey = "colorlinketh-theme-v2";
+        const theme = localStorage.getItem(storageKey) ?? "dark";
+        document.documentElement.classList.toggle("theme-dark", theme === "dark");
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen bg-[var(--page-bg)] text-[var(--text-main)] antialiased selection:bg-[var(--accent-cyan)]/20 selection:text-[var(--text-main)]">
+    <slot />
+  </body>
+</html>
