@@ -21,12 +21,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Install, build, and upload Astro site
-        uses: withastro/action@v6
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-          package-manager: pnpm@latest
-          build-cmd: pnpm run build
+          cache: pnpm
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Astro site
+        run: pnpm build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
 
   deploy:
     needs: build
